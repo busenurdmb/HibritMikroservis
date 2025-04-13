@@ -3,7 +3,7 @@ using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 using SharedKernel.Events;
-using NotificationService.Services;
+
 
 namespace NotificationService.Consumers;
 
