@@ -1,7 +1,9 @@
 ﻿using BuildingBlocks.Mail;
+using MediatR;
+using NotificationService.Application.Commands;
 using NotificationService.Infrastructure;
 
-public class WelcomeMailService(IMailSender mailSender, NotificationDbContext dbContext)
+public class WelcomeMailService(IMailSender mailSender, IMediator mediator)
 {
     public async Task SendWelcomeMail(string email)
     {
@@ -10,14 +12,11 @@ public class WelcomeMailService(IMailSender mailSender, NotificationDbContext db
         await mailSender.SendAsync(email, subject, body);
 
         // Veritabanına log kaydet
-        var log = new MailLog
+        await mediator.Send(new LogMailCommand
         {
             Email = email,
             SentAt = DateTime.UtcNow
-        };
-
-        dbContext.MailLogs.Add(log);
-        await dbContext.SaveChangesAsync();
+        });
     }
 }
    

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NotificationService.Domain;
 
 namespace NotificationService.Infrastructure;
 
@@ -9,9 +10,4 @@ public class NotificationDbContext : DbContext
     public DbSet<MailLog> MailLogs => Set<MailLog>();
 }
 
-public class MailLog
-{
-    public int Id { get; set; }
-    public string Email { get; set; } = null!;
-    public DateTime SentAt { get; set; }
-}
+
