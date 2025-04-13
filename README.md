@@ -14,7 +14,7 @@ Bu proje, bir iş mülakatı senaryosuna uygun olarak geliştirilmiş hibrit bir
 - Gönderilen mailler PostgreSQL veritabanına loglanacak
 
 ---
-![index]()
+![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/task.png)
 ## 🧱 Mimaride Kullanılan Teknolojiler
 
 - .NET **9** WebAPI
