@@ -1,4 +1,4 @@
-﻿namespace NotificationService.Domain;
+﻿namespace NotificationService.Domain.Enitites;
 
 public class MailLog
 {
