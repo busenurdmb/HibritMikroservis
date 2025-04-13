@@ -11,13 +11,14 @@ Bu proje, bir iş mülakatı senaryosuna uygun olarak geliştirilmiş hibrit bir
 - Kullanıcı doğrulama kodunu girecek
 - Doğrulama başarılıysa event fırlatılacak
 - Notification servisi bu event'i dinleyip "hoş geldiniz" maili gönderecek (simüle)
+- Gönderilen mailler PostgreSQL veritabanına loglanacak
 
 ---
 ![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/task.png)
 ## 🧱 Mimaride Kullanılan Teknolojiler
 
 - .NET **9** WebAPI
-- PostgreSQL (IdentityService)
+- PostgreSQL (IdentityService + NotificationService)
 - RabbitMQ (Docker)
 - MediatR + CQRS
 - FluentValidation
@@ -34,14 +35,14 @@ HibritMikroservis/
 ├── IdentityService/               // Kullanıcı kaydı ve onay servisi
 ├── NotificationService/           // Event'i dinleyip mail atan servis
 ├── SharedKernel/                  // Ortak event modelleri
-├── BuildingBlocks/                // RabbitMQ soyutlamaları (EventBus)
+├── BuildingBlocks/                // RabbitMQ ve Mail soyutlamaları
 └── docker-compose.yml             // RabbitMQ servisi
 ```
 
 ---
 ![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/identity.png)
+![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/register.png)
 ![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/confirm.png)
-
 ## 📦 Servisler Arası Akış (Saga Pattern)
 
 ```
@@ -54,7 +55,8 @@ HibritMikroservis/
 
 NotificationService:
    → Event'i dinler
-   → Hoş geldiniz mailini console'a yazar
+   → Mail gönderir (console üzerinden)
+   → PostgreSQL'e MailLog olarak kaydeder
 ```
 
 ---
@@ -69,11 +71,11 @@ services:
     ports:
       - "5673:5672"
       - "15673:15672"
-  
+ 
 ```
 
-Yönetim Paneli: http://localhost:15672  
-Kullanıcı: `guest` - Şifre: `guest`
+Yönetim Paneli: http://localhost:15673  
+Kullanıcı: `quest` - Şifre: `quest`
 
 ---
 
@@ -85,7 +87,15 @@ Kullanıcı: `guest` - Şifre: `guest`
 4. NotificationService konsolunda şu çıkar:
 
 ```
-[Mail Gitti] kullanici@example.com adresine hoş geldiniz maili gönderildi.
+[Mail] To: kullanici@example.com | Subject: Hoş Geldiniz! | Body: Sisteme başarıyla kaydoldunuz.
+```
+
+5. PostgreSQL → `MailLogs` tablosunda kayıt oluşur:
+
+```
+Id | Email               | SentAt
+---|---------------------|------------------------
+1  | kullanici@example.com | 2024-04-13T12:34:56Z
 ```
 
 ---
@@ -95,12 +105,15 @@ Kullanıcı: `guest` - Şifre: `guest`
 Bu yapıda **Choreography Saga Pattern** uygulanmıştır:
 - IdentityService event fırlatır
 - NotificationService event'i dinler
+- Mail gönderimi sonrası veritabanına kayıt yapılır
 - Orkestratör yoktur, event zinciriyle ilerlenir
 
 ---
 
 ## 📌 Notlar
 
+- Mail işlemleri `IMailSender` ile soyutlanmış ve BuildingBlocks klasörüne taşınmıştır
+- NotificationService de artık PostgreSQL veritabanı kullanmaktadır
 - Gerçek mail yerine console log kullanılmıştır (isteğe bağlı MailKit entegre edilebilir)
 - Şifre hashleme veya ek servis eklenmemiştir çünkü task kapsamında istenmemektedir
 - Saga tek adımlı şekilde sadelikle uygulanmıştır
@@ -113,7 +126,18 @@ Bu proje, event-driven microservice yapısında:
 - Asenkron haberleşme
 - Saga Pattern
 - SOLID prensipleri
+- PostgreSQL üzerinden loglama
 - Temiz ve sade bir task uygulamasını ortaya koyar.
 
 Projeyi geliştiren: `Buse Nur Demirbaş` 💻
+
+
+
+
+
+---
+
+
+
+
 
