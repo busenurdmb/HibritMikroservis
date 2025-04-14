@@ -1,10 +1,12 @@
 using BuildingBlocks.EventBus;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using IdentityService.Application;
 using IdentityService.Application.Commands;
 using IdentityService.Infrastructure.DbContexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +16,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddMediatR(typeof(Program)); // CQRS için
+//builder.Services.AddMediatR(typeof(Program)); // CQRS için
+builder.Services.AddApplicationService(builder.Configuration);
 
 // FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserValidatorr>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
 
 builder.Services.AddSingleton<IEventPublisher, RabbitMQEventPublisher>();
 

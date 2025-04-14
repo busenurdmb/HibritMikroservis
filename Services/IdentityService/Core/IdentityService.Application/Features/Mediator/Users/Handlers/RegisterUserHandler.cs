@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Application.Handlers;
 
-public class RegisterUserHandler(AppDbContext dbContext) : IRequestHandler<RegisterUserCommandd, bool>
+public class RegisterUserHandler(AppDbContext dbContext) : IRequestHandler<RegisterUserCommand, bool>
 {
-    public async Task<bool> Handle(RegisterUserCommandd request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         // Aynı email varsa kayıt etme
         if (await dbContext.Users.AnyAsync(x => x.Email == request.Email, cancellationToken))

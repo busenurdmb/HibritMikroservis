@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace BuildingBlocks.Mail;
+namespace BuildingBlocks.Mail.Consoles;
 
-public class ConsoleMailSender : IMailSender
+public class ConsoleMailSender /*: IMailSender*/
 {
     public Task SendAsync(string to, string subject, string body)
     {

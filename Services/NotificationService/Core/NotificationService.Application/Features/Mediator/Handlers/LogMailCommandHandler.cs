@@ -6,7 +6,7 @@ using NotificationService.Infrastructure;
 
 namespace NotificationService.Application.Handlers;
 
-public class LogMailCommandHandler(NotificationDbContext dbContext) : IRequestHandler<LogMailCommand>
+public class LogMailCommandHandler(NotificationDbContext dbContext) : IRequestHandler<LogMailCommand,Unit>
 {
     public async Task<Unit> Handle(LogMailCommand request, CancellationToken cancellationToken)
     {
@@ -19,4 +19,6 @@ public class LogMailCommandHandler(NotificationDbContext dbContext) : IRequestHa
         await dbContext.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
+
+
 }

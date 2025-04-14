@@ -2,14 +2,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IdentityService.Controllers;
+namespace IdentityService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController(IMediator mediator) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterUserCommandd command)
+    public async Task<IActionResult> Register(RegisterUserCommand command)
     {
         var result = await mediator.Send(command);
         if (!result)
