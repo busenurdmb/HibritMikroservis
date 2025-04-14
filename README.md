@@ -53,6 +53,7 @@ HibritMikroservis/
 ![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/identity.png)
 ![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/register.png)
 ![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/confirm.png)
+![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/email.png)
 ## 📦 Servisler Arası Akış (Saga Pattern)
 
 ```
