@@ -7,11 +7,11 @@ Bu proje, bir iş mülakatı senaryosuna uygun olarak geliştirilmiş hibrit bir
 ## 🎯 Amaç
 
 - Kullanıcı kaydı alınacak
-- Doğrulama kodu e-posta ile gönderilecek (simüle)
+- Doğrulama kodu e-posta ile gönderilecek (gerçek SMTP ile)
 - Kullanıcı doğrulama kodunu girecek
 - Doğrulama başarılıysa event fırlatılacak
-- Notification servisi bu event'i dinleyip "hoş geldiniz" maili gönderecek (simüle)
-- Gönderilen mailler PostgreSQL veritabanına loglanacak
+- Notification servisi bu event'i dinleyip "hoş geldiniz" maili gönderecek (gerçek mail)
+- Gönderilen mailler PostgreSQL veritabanına CQRS-Mediator ile loglanacak
 
 ---
 ![index](https://github.com/busenurdmb/HibritMikroservis/blob/master/images/task.png)
@@ -25,6 +25,7 @@ Bu proje, bir iş mülakatı senaryosuna uygun olarak geliştirilmiş hibrit bir
 - SOLID ve Clean Architecture yaklaşımı
 - Event-Driven Design
 - Saga Pattern (Choreography)
+- MailKit ile SMTP mail gönderimi
 
 ---
 
@@ -32,11 +33,20 @@ Bu proje, bir iş mülakatı senaryosuna uygun olarak geliştirilmiş hibrit bir
 
 ```
 HibritMikroservis/
-├── IdentityService/               // Kullanıcı kaydı ve onay servisi
-├── NotificationService/           // Event'i dinleyip mail atan servis
-├── SharedKernel/                  // Ortak event modelleri
-├── BuildingBlocks/                // RabbitMQ ve Mail soyutlamaları
-└── docker-compose.yml             // RabbitMQ servisi
+├── Services/
+│   ├── IdentityService/
+│   │   ├── API
+│   │   ├── Application
+│   │   ├── Domain
+│   │   └── Infrastructure
+│   └── NotificationService/
+│       ├── API
+│       ├── Application
+│       ├── Domain
+│       └── Infrastructure
+├── SharedKernel/
+├── BuildingBlocks/
+└── docker-compose.yml
 ```
 
 ---
@@ -55,8 +65,8 @@ HibritMikroservis/
 
 NotificationService:
    → Event'i dinler
-   → Mail gönderir (console üzerinden)
-   → PostgreSQL'e MailLog olarak kaydeder
+   → Mail gönderir (gerçek SMTP üzerinden MailKit ile)
+   → CQRS + MediatR ile PostgreSQL'e MailLog olarak kaydeder
 ```
 
 ---
@@ -84,7 +94,9 @@ Kullanıcı: `quest` - Şifre: `quest`
 1. `POST /api/auth/register` ile kayıt olun
 2. Console'dan doğrulama kodunu alın
 3. `POST /api/auth/confirm` ile kodu gönderin
-4. NotificationService konsolunda şu çıkar:
+4. Mail doğrudan Gmail veya SMTP sunucusuna gider ✉️
+5. PostgreSQL → `MailLogs` tablosunda kayıt oluşur:
+6. NotificationService konsolunda şu çıkar:
 
 ```
 [Mail] To: kullanici@example.com | Subject: Hoş Geldiniz! | Body: Sisteme başarıyla kaydoldunuz.
@@ -113,21 +125,22 @@ Bu yapıda **Choreography Saga Pattern** uygulanmıştır:
 ## 📌 Notlar
 
 - Mail işlemleri `IMailSender` ile soyutlanmış ve BuildingBlocks klasörüne taşınmıştır
-- NotificationService de artık PostgreSQL veritabanı kullanmaktadır
-- Gerçek mail yerine console log kullanılmıştır (isteğe bağlı MailKit entegre edilebilir)
-- Şifre hashleme veya ek servis eklenmemiştir çünkü task kapsamında istenmemektedir
-- Saga tek adımlı şekilde sadelikle uygulanmıştır
+- SMTP mail gönderimi için MailKit kütüphanesi kullanılmıştır
+- Mail konfigürasyonu `appsettings.json` üzerinden `IOptions<MailSettings>` yapısıyla alınır
+- NotificationService CQRS yapısına uygun şekilde handler ve command ile çalışır
+- Saga Pattern basit ve etkili bir senaryo ile uygulanmıştır
 
 ---
 
 ## ✅ Sonuç
 
 Bu proje, event-driven microservice yapısında:
-- Asenkron haberleşme
-- Saga Pattern
-- SOLID prensipleri
-- PostgreSQL üzerinden loglama
-- Temiz ve sade bir task uygulamasını ortaya koyar.
+- Gerçek zamanlı e-posta işlemi
+- Asenkron haberleşme (RabbitMQ)
+- Saga Pattern uygulaması
+- CQRS + MediatR altyapısı
+- PostgreSQL üzerinde kalıcı loglama
+- Temiz, modüler ve mülakata uygun yapı
 
 Projeyi geliştiren: `Buse Nur Demirbaş` 💻
 
